@@ -19,6 +19,13 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import java.util.concurrent.TimeUnit
+import kotlin.coroutines.AbstractCoroutineContextElement
+import kotlin.coroutines.ContinuationInterceptor
+import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.EmptyCoroutineContext
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.selects.SelectInstance
 
 /**
  * A simple [Fragment] subclass as the default destination in the navigation.
@@ -26,8 +33,11 @@ import java.util.concurrent.TimeUnit
 class FirstFragment : Fragment() {
 
     companion object {
-        private val TAG_EXAMPLE_7 = "TAG_EXAMPLE_7"
-        private val TAG_EXAMPLE_8 = "TAG_EXAMPLE_8"
+        private const val TAG_EXAMPLE_7 = "TAG_EXAMPLE_7"
+        private const val TAG_EXAMPLE_8 = "TAG_EXAMPLE_8"
+        private const val TAG_EXAMPLE_9 = "TAG_EXAMPLE_9"
+        private const val TAG_EXAMPLE_10 = "TAG_EXAMPLE_10"
+        private const val TAG_EXAMPLE_11 = "TAG_EXAMPLE_11"
     }
 
     private var _binding: FragmentFirstBinding? = null
@@ -36,14 +46,14 @@ class FirstFragment : Fragment() {
     // onDestroyView.
     private val binding get() = _binding!!
 
+    private val formatter = SimpleDateFormat("HH:mm:ss.SSS", Locale.getDefault())
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-
         _binding = FragmentFirstBinding.inflate(inflater, container, false)
         return binding.root
-
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -51,6 +61,9 @@ class FirstFragment : Fragment() {
 
         coroutineExample7()
         coroutineExample8()
+        coroutineExample9()
+        coroutineExample10()
+        coroutineExample11()
     }
 
     private fun coroutineExample7() {
@@ -113,70 +126,63 @@ class FirstFragment : Fragment() {
          */
         lateinit var jobForCancel: Job
 
-        val formatter = SimpleDateFormat("HH:mm:ss.SSS", Locale.getDefault())
         val scope = CoroutineScope(Job())
 
-        fun log(text: String) {
-            Log.d(TAG_EXAMPLE_8, "${formatter.format(Date())} $text [${Thread.currentThread().name}]")
-        }
-
         fun onRun() {
-            log("onRun, start")
+            log(TAG_EXAMPLE_8, "onRun, start")
 
             scope.launch {
-                log("coroutine1, start")
+                log(TAG_EXAMPLE_8, "coroutine1, start")
 
                 scope.launch {
-                    log("coroutine2, start")
+                    log(TAG_EXAMPLE_8, "coroutine2, start")
                     TimeUnit.MILLISECONDS.sleep(1000)
-                    log("coroutine2, end")
+                    log(TAG_EXAMPLE_8, "coroutine2, end")
                 }
 
                 TimeUnit.MILLISECONDS.sleep(1000)
-                log("coroutine1, end")
+                log(TAG_EXAMPLE_8, "coroutine1, end")
             }
 
-            log("onRun, middle")
+            log(TAG_EXAMPLE_8, "onRun, middle")
 
             scope.launch {
-                log("coroutine3, start")
+                log(TAG_EXAMPLE_8, "coroutine3, start")
                 TimeUnit.MILLISECONDS.sleep(1500)
-                log("coroutine3, end")
+                log(TAG_EXAMPLE_8, "coroutine3, end")
             }
 
-            log("onRun, end")
+            log(TAG_EXAMPLE_8, "onRun, end")
         }
 
         fun onRunForCancel() {
-            log("onRunForCancel, start")
+            log(TAG_EXAMPLE_8, "onRunForCancel, start")
 
             jobForCancel = scope.launch {
-                log("coroutine, start")
+                log(TAG_EXAMPLE_8, "coroutine, start")
                 var x = 0
                 while (x < 5 && isActive) {
                     TimeUnit.MILLISECONDS.sleep(1000)
-                    log("coroutine, ${x++}, isActive = ${isActive}")
+                    log(TAG_EXAMPLE_8, "coroutine, ${x++}, isActive = ${isActive}")
 
                     scope.launch {
-                        log("INNER coroutine, start")
+                        log(TAG_EXAMPLE_8, "INNER coroutine, start")
                         var x1 = 0
                         while (x1 < 5 && isActive) {
                             TimeUnit.MILLISECONDS.sleep(1000)
-                            log("INNER coroutine, ${x1++}, isActive = ${isActive}")
-
-
+                            log(TAG_EXAMPLE_8, "INNER coroutine, ${x1++}, isActive = ${isActive}")
                         }
-                        log("INNER coroutine, end")
+                        log(TAG_EXAMPLE_8, "INNER coroutine, end")
                     }
                 }
-                log("coroutine, end")
+                log(TAG_EXAMPLE_8, "coroutine, end")
             }
 
-            log("onRunForCancel, end")
+            log(TAG_EXAMPLE_8, "onRunForCancel, end")
         }
 
         fun onCancel() {
-            log("onCancel")
+            log(TAG_EXAMPLE_8, "onCancel")
             jobForCancel.cancel()
         }
 
@@ -190,13 +196,202 @@ class FirstFragment : Fragment() {
         }
 
         binding.example8DestroyBtn.setOnClickListener {
-            log("onDestroy")
+            log(TAG_EXAMPLE_8, "onDestroy")
             scope.cancel()
+        }
+    }
+
+    private fun coroutineExample9() {
+        /*
+         * Урок 9. Корутины. Билдеры launch и async.
+         *
+         * https://startandroid.ru/ru/courses/kotlin/29-course/kotlin/604-urok-9-korutiny-bildery-launch-i-async.html
+         */
+        val scope = CoroutineScope(Job())
+
+        fun onRun() {
+            /* Пример 1. Ожидание одной дочерней корутины. */
+//            scope.launch {
+//                log(TAG_EXAMPLE_9,"parent coroutine, start")
+//
+//                val job = launch {
+//                    log(TAG_EXAMPLE_9,"child coroutine, start")
+//                    TimeUnit.MILLISECONDS.sleep(1000)
+//                    log(TAG_EXAMPLE_9,"child coroutine, end")
+//                }
+//
+//                log(TAG_EXAMPLE_9,"parent coroutine, wait until child completes")
+//                job.join()
+//
+//                log(TAG_EXAMPLE_9,"parent coroutine, end")
+//            }
+
+            /* Пример 2. Ожидание нескольких дочерних корутин. */
+            scope.launch {
+                log(TAG_EXAMPLE_9,"parent coroutine, start")
+
+                val job = launch {
+                    TimeUnit.MILLISECONDS.sleep(1000)
+                }
+
+                val job2 = launch {
+                    TimeUnit.MILLISECONDS.sleep(1500)
+                }
+
+                log(TAG_EXAMPLE_9, "parent coroutine, wait until children complete")
+                job.join()
+                job2.join()
+
+                log(TAG_EXAMPLE_9,"parent coroutine, end")
+            }
+        }
+
+        fun onRunAsync() {
+            scope.launch {
+                log(TAG_EXAMPLE_9,"parent coroutine, start")
+
+                val deferred = async() {
+                    log(TAG_EXAMPLE_9,"child coroutine, start")
+                    TimeUnit.MILLISECONDS.sleep(1000)
+                    log(TAG_EXAMPLE_9,"child coroutine, end")
+
+                    return@async "Obtained async result"
+                }
+
+                log(TAG_EXAMPLE_9,"parent coroutine, wait until child returns result")
+                val result = deferred.await()
+                log(TAG_EXAMPLE_9,"parent coroutine, child returns: $result")
+
+                log(TAG_EXAMPLE_9,"parent coroutine, end")
+            }
+        }
+
+        suspend fun getData(): String {
+            delay(1000)
+            return "data"
+        }
+
+        suspend fun getData2(): String {
+            delay(1500)
+            return "data2"
+        }
+
+        fun onRunNonParallel() {
+            scope.launch {
+                log(TAG_EXAMPLE_9,"parent coroutine, start")
+
+                val data = getData()
+                val data2 = getData2()
+                val result = "${data}, ${data2}"
+                log(TAG_EXAMPLE_9,"parent coroutine, children returned: $result")
+
+                log(TAG_EXAMPLE_9,"parent coroutine, end")
+            }
+        }
+
+        fun onRunParallel() {
+            scope.launch {
+                log(TAG_EXAMPLE_9,"parent coroutine, start")
+
+                val data = async { getData() }
+                val data2 = async { getData2() }
+
+                log(TAG_EXAMPLE_9,"parent coroutine, wait until children return result")
+                val result = "${data.await()}, ${ data2.await()}"
+                log(TAG_EXAMPLE_9,"parent coroutine, children returned: $result")
+
+                log(TAG_EXAMPLE_9,"parent coroutine, end")
+            }
+        }
+
+        fun onCancel() {
+
+        }
+
+        binding.example9RunBtn.setOnClickListener {
+//            onRun()
+//            onRunAsync()
+//            onRunNonParallel()
+            onRunParallel()
+        }
+    }
+
+    private fun coroutineExample10() {
+        /*
+         * Урок 10. Корутины. Context
+         *
+         * https://startandroid.ru/ru/courses/kotlin/29-course/kotlin/605-urok-10-korutiny-context.html
+         */
+
+        // 1. Создаем свой Context
+//        val context = Job() + Dispatchers.Default
+//        log(TAG_EXAMPLE_10, "context = $context")
+
+        // 2.1. Создаем свой Scope
+        // val scope = CoroutineScope(context)
+
+        // 2.2. Создаем Scope с пустым контекстом
+//        val scope = CoroutineScope(EmptyCoroutineContext)
+//        log(TAG_EXAMPLE_10, "scope, ${contextToString(scope.coroutineContext)}")
+//        scope.launch {
+//            log(TAG_EXAMPLE_10, "coroutine, ${contextToString(coroutineContext)}")
+//        }
+
+        // 2.3. Создаем Scope с контекстом в котором кастомный диспетчер
+        val scope = CoroutineScope(Job() + Dispatchers.Main + UserData(-1, "TestName1", 12))
+        log(TAG_EXAMPLE_10, "scope, ${contextToString(scope.coroutineContext)}")
+        scope.launch {
+            log(TAG_EXAMPLE_10, "coroutine, ${contextToString(coroutineContext)}")
+        }
+
+        fun innerCoroutinesContext() {
+            scope.launch {
+                log(TAG_EXAMPLE_10, "coroutine, level1, ${contextToString(coroutineContext)}")
+
+                launch(Dispatchers.Default + UserData(-2, "TestName2", 13)) {
+                    log(TAG_EXAMPLE_10, "coroutine, level2, ${contextToString(coroutineContext)}")
+
+                    launch {
+                        log(TAG_EXAMPLE_10, "coroutine, level3, ${contextToString(coroutineContext)}")
+                    }
+                }
+            }
+        }
+
+        binding.example10CreateContextBtn.setOnClickListener {
+            innerCoroutinesContext()
+        }
+    }
+
+    private fun coroutineExample11() {
+        /*
+         * Урок 11. Корутины. Dispatcher
+         *
+         * https://startandroid.ru/ru/courses/kotlin/29-course/kotlin/606-urok-11-korutiny-dispatcher.html
+         */
+
+        binding.example11Btn.setOnClickListener {
+
         }
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    private fun log(tag: String, text: String) {
+        Log.d(tag, "${formatter.format(Date())} $text [${Thread.currentThread().name}]")
+    }
+
+    private fun contextToString(context: CoroutineContext): String =
+        "Job = ${context[Job]}, Dispatcher = ${context[ContinuationInterceptor]}, UserData = ${context[UserData]}"
+
+    private data class UserData(
+        val id: Long,
+        val name: String,
+        val age: Int
+    ): AbstractCoroutineContextElement(UserData) {
+        companion object Key : CoroutineContext.Key<UserData>
     }
 }
