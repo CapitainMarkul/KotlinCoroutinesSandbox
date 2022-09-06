@@ -18,12 +18,17 @@ import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
+import kotlin.concurrent.thread
 import kotlin.coroutines.AbstractCoroutineContextElement
 import kotlin.coroutines.ContinuationInterceptor
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.async
 import kotlinx.coroutines.selects.SelectInstance
 
@@ -38,6 +43,25 @@ class FirstFragment : Fragment() {
         private const val TAG_EXAMPLE_9 = "TAG_EXAMPLE_9"
         private const val TAG_EXAMPLE_10 = "TAG_EXAMPLE_10"
         private const val TAG_EXAMPLE_11 = "TAG_EXAMPLE_11"
+        private const val TAG_EXAMPLE_12 = "TAG_EXAMPLE_12"
+        private const val TAG_EXAMPLE_13 = "TAG_EXAMPLE_13"
+        private const val TAG_EXAMPLE_14 = "TAG_EXAMPLE_14"
+        private const val TAG_EXAMPLE_15 = "TAG_EXAMPLE_15"
+        private const val TAG_EXAMPLE_16 = "TAG_EXAMPLE_16"
+        private const val TAG_EXAMPLE_17 = "TAG_EXAMPLE_17"
+        private const val TAG_EXAMPLE_18 = "TAG_EXAMPLE_18"
+        private const val TAG_EXAMPLE_19 = "TAG_EXAMPLE_19"
+        private const val TAG_EXAMPLE_20 = "TAG_EXAMPLE_20"
+        private const val TAG_EXAMPLE_21 = "TAG_EXAMPLE_21"
+        private const val TAG_EXAMPLE_22 = "TAG_EXAMPLE_22"
+        private const val TAG_EXAMPLE_23 = "TAG_EXAMPLE_23"
+        private const val TAG_EXAMPLE_24 = "TAG_EXAMPLE_24"
+        private const val TAG_EXAMPLE_25 = "TAG_EXAMPLE_25"
+        private const val TAG_EXAMPLE_26 = "TAG_EXAMPLE_26"
+        private const val TAG_EXAMPLE_27 = "TAG_EXAMPLE_27"
+        private const val TAG_EXAMPLE_28 = "TAG_EXAMPLE_28"
+        private const val TAG_EXAMPLE_29 = "TAG_EXAMPLE_29"
+        private const val TAG_EXAMPLE_30 = "TAG_EXAMPLE_30"
     }
 
     private var _binding: FragmentFirstBinding? = null
@@ -370,7 +394,36 @@ class FirstFragment : Fragment() {
          * https://startandroid.ru/ru/courses/kotlin/29-course/kotlin/606-urok-11-korutiny-dispatcher.html
          */
 
+        /* На дефолтном диспетчере - корутины ожидают очереди, на IO - нет, т.к. там 64+ потока в пуле. */
+        val scope = CoroutineScope(Dispatchers.Default)
+
+        /* Кастомный Executor с одим потоком. */
+        val scopeSingleThread = CoroutineScope(
+            Executors.newSingleThreadExecutor().asCoroutineDispatcher()
+        )
+
+        /* Диспетчер, который не переключает поток. */
+        val scopeUnconfined = CoroutineScope(Dispatchers.Unconfined)
+
         binding.example11Btn.setOnClickListener {
+            repeat(6) {
+                scope.launch {
+                    log(TAG_EXAMPLE_11, "coroutine $it, start")
+                    TimeUnit.MILLISECONDS.sleep(100)
+                    log(TAG_EXAMPLE_11, "coroutine $it, end")
+                }
+            }
+        }
+    }
+
+    private fun coroutineExample12() {
+        /*
+         * Урок 12. Корутины. Связь между родительской и дочерней корутиной
+         *
+         * https://startandroid.ru/ru/courses/kotlin/29-course/kotlin/607-urok-12-svyaz-mezhdu-roditelskoy-i-docherney-korutinoy.html
+         */
+
+        binding.example12Btn.setOnClickListener {
 
         }
     }
@@ -394,4 +447,12 @@ class FirstFragment : Fragment() {
     ): AbstractCoroutineContextElement(UserData) {
         companion object Key : CoroutineContext.Key<UserData>
     }
+
+    private suspend fun getData(): String =
+        suspendCoroutine {
+            thread {
+                TimeUnit.MILLISECONDS.sleep(3000)
+                it.resume("Data")
+            }
+        }
 }
