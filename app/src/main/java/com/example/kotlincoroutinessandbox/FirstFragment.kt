@@ -88,6 +88,8 @@ class FirstFragment : Fragment() {
         coroutineExample9()
         coroutineExample10()
         coroutineExample11()
+        coroutineExample12()
+        coroutineExample13()
     }
 
     private fun coroutineExample7() {
@@ -422,8 +424,37 @@ class FirstFragment : Fragment() {
          *
          * https://startandroid.ru/ru/courses/kotlin/29-course/kotlin/607-urok-12-svyaz-mezhdu-roditelskoy-i-docherney-korutinoy.html
          */
+        val scope = CoroutineScope(Dispatchers.Default)
 
         binding.example12Btn.setOnClickListener {
+            val job = scope.launch {
+                log(TAG_EXAMPLE_12,"parent start")
+                launch {
+                    log(TAG_EXAMPLE_12,"child start")
+                    delay(1000)
+                    log(TAG_EXAMPLE_12,"child end")
+                }
+                log(TAG_EXAMPLE_12,"parent end")
+            }
+
+            scope.launch {
+                delay(500)
+                log(TAG_EXAMPLE_12,"parent job is active: ${job.isActive}")
+                delay(1000)
+                log(TAG_EXAMPLE_12,"parent job is active: ${job.isActive}")
+            }
+        }
+    }
+
+    private fun coroutineExample13() {
+        /*
+         * Урок 13. Корутины. Обработка исключений
+         *
+         * https://startandroid.ru/ru/courses/kotlin/29-course/kotlin/608-urok-13-obrabotka-oshibok.html
+         */
+        val scope = CoroutineScope(Dispatchers.Default)
+
+        binding.example13Btn.setOnClickListener {
 
         }
     }

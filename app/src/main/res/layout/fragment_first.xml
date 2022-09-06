@@ -1,141 +1,170 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    tools:context=".FirstFragment">
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:text="Example 8 | Coroutine Отмена"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        tools:ignore="HardcodedText"/>
+    android:layout_height="match_parent">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:orientation="vertical"
+        tools:context=".FirstFragment">
 
-        <Button
-            android:id="@+id/example_8_run_btn"
-            android:layout_width="wrap_content"
+        <TextView
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="RUN"
+            android:gravity="center"
+            android:text="Example 8 | Coroutine Отмена"
+            android:textSize="18sp"
+            android:textStyle="bold"
             tools:ignore="HardcodedText"/>
 
-        <Button
-            android:id="@+id/example_8_cancel_btn"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
-            android:text="CANCEL"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/example_8_run_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="RUN"
+                tools:ignore="HardcodedText"/>
+
+            <Button
+                android:id="@+id/example_8_cancel_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:text="CANCEL"
+                tools:ignore="HardcodedText"/>
+
+            <Button
+                android:id="@+id/example_8_destroy_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:text="DESTROY"
+                tools:ignore="HardcodedText"/>
+
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="Example 9 | Coroutine launch и async"
+            android:textSize="18sp"
+            android:textStyle="bold"
             tools:ignore="HardcodedText"/>
 
-        <Button
-            android:id="@+id/example_8_destroy_btn"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
-            android:text="DESTROY"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/example_9_run_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="RUN"
+                tools:ignore="HardcodedText"/>
+
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="Example 10 | Coroutine Context"
+            android:textSize="18sp"
+            android:textStyle="bold"
             tools:ignore="HardcodedText"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/example_10_create_context_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="RUN"
+                tools:ignore="HardcodedText"/>
+
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="Example 11 | Coroutine Dispatchers"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            tools:ignore="HardcodedText"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/example_11_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="RUN"
+                tools:ignore="HardcodedText"/>
+
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="Example 12 | Coroutine Связь между родительской и дочерней корутиной"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            tools:ignore="HardcodedText"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/example_12_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="RUN"
+                tools:ignore="HardcodedText"/>
+
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="Example 13 | Обработка исключений"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            tools:ignore="HardcodedText"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/example_13_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="RUN"
+                tools:ignore="HardcodedText"/>
+
+        </LinearLayout>
 
     </LinearLayout>
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:text="Example 9 | Coroutine launch и async"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        tools:ignore="HardcodedText"/>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-        <Button
-            android:id="@+id/example_9_run_btn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="RUN"
-            tools:ignore="HardcodedText"/>
-
-    </LinearLayout>
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:text="Example 10 | Coroutine Context"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        tools:ignore="HardcodedText"/>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-        <Button
-            android:id="@+id/example_10_create_context_btn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="RUN"
-            tools:ignore="HardcodedText"/>
-
-    </LinearLayout>
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:text="Example 11 | Coroutine Dispatchers"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        tools:ignore="HardcodedText"/>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-        <Button
-            android:id="@+id/example_11_btn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="RUN"
-            tools:ignore="HardcodedText"/>
-
-    </LinearLayout>
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:text="Example 12 | Coroutine Связь между родительской и дочерней корутиной"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        tools:ignore="HardcodedText"/>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-        <Button
-            android:id="@+id/example_12_btn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="RUN"
-            tools:ignore="HardcodedText"/>
-
-    </LinearLayout>
-
-</LinearLayout>
+</ScrollView>
