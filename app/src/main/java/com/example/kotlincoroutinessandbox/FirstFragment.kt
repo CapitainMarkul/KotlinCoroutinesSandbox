@@ -2,19 +2,11 @@ package com.example.kotlincoroutinessandbox
 
 import android.os.Bundle
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.navigation.fragment.findNavController
+import androidx.fragment.app.Fragment
 import com.example.kotlincoroutinessandbox.databinding.FragmentFirstBinding
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.CoroutineStart
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.isActive
-import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -24,13 +16,21 @@ import kotlin.concurrent.thread
 import kotlin.coroutines.AbstractCoroutineContextElement
 import kotlin.coroutines.ContinuationInterceptor
 import kotlin.coroutines.CoroutineContext
-import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
+import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.CoroutineName
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.async
-import kotlinx.coroutines.selects.SelectInstance
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
 
 /**
  * A simple [Fragment] subclass as the default destination in the navigation.
@@ -90,6 +90,7 @@ class FirstFragment : Fragment() {
         coroutineExample11()
         coroutineExample12()
         coroutineExample13()
+        coroutineExample14()
     }
 
     private fun coroutineExample7() {
@@ -254,7 +255,7 @@ class FirstFragment : Fragment() {
 
             /* Пример 2. Ожидание нескольких дочерних корутин. */
             scope.launch {
-                log(TAG_EXAMPLE_9,"parent coroutine, start")
+                log(TAG_EXAMPLE_9, "parent coroutine, start")
 
                 val job = launch {
                     TimeUnit.MILLISECONDS.sleep(1000)
@@ -268,27 +269,27 @@ class FirstFragment : Fragment() {
                 job.join()
                 job2.join()
 
-                log(TAG_EXAMPLE_9,"parent coroutine, end")
+                log(TAG_EXAMPLE_9, "parent coroutine, end")
             }
         }
 
         fun onRunAsync() {
             scope.launch {
-                log(TAG_EXAMPLE_9,"parent coroutine, start")
+                log(TAG_EXAMPLE_9, "parent coroutine, start")
 
                 val deferred = async() {
-                    log(TAG_EXAMPLE_9,"child coroutine, start")
+                    log(TAG_EXAMPLE_9, "child coroutine, start")
                     TimeUnit.MILLISECONDS.sleep(1000)
-                    log(TAG_EXAMPLE_9,"child coroutine, end")
+                    log(TAG_EXAMPLE_9, "child coroutine, end")
 
                     return@async "Obtained async result"
                 }
 
-                log(TAG_EXAMPLE_9,"parent coroutine, wait until child returns result")
+                log(TAG_EXAMPLE_9, "parent coroutine, wait until child returns result")
                 val result = deferred.await()
-                log(TAG_EXAMPLE_9,"parent coroutine, child returns: $result")
+                log(TAG_EXAMPLE_9, "parent coroutine, child returns: $result")
 
-                log(TAG_EXAMPLE_9,"parent coroutine, end")
+                log(TAG_EXAMPLE_9, "parent coroutine, end")
             }
         }
 
@@ -304,29 +305,29 @@ class FirstFragment : Fragment() {
 
         fun onRunNonParallel() {
             scope.launch {
-                log(TAG_EXAMPLE_9,"parent coroutine, start")
+                log(TAG_EXAMPLE_9, "parent coroutine, start")
 
                 val data = getData()
                 val data2 = getData2()
                 val result = "${data}, ${data2}"
-                log(TAG_EXAMPLE_9,"parent coroutine, children returned: $result")
+                log(TAG_EXAMPLE_9, "parent coroutine, children returned: $result")
 
-                log(TAG_EXAMPLE_9,"parent coroutine, end")
+                log(TAG_EXAMPLE_9, "parent coroutine, end")
             }
         }
 
         fun onRunParallel() {
             scope.launch {
-                log(TAG_EXAMPLE_9,"parent coroutine, start")
+                log(TAG_EXAMPLE_9, "parent coroutine, start")
 
                 val data = async { getData() }
                 val data2 = async { getData2() }
 
-                log(TAG_EXAMPLE_9,"parent coroutine, wait until children return result")
-                val result = "${data.await()}, ${ data2.await()}"
-                log(TAG_EXAMPLE_9,"parent coroutine, children returned: $result")
+                log(TAG_EXAMPLE_9, "parent coroutine, wait until children return result")
+                val result = "${data.await()}, ${data2.await()}"
+                log(TAG_EXAMPLE_9, "parent coroutine, children returned: $result")
 
-                log(TAG_EXAMPLE_9,"parent coroutine, end")
+                log(TAG_EXAMPLE_9, "parent coroutine, end")
             }
         }
 
@@ -428,20 +429,20 @@ class FirstFragment : Fragment() {
 
         binding.example12Btn.setOnClickListener {
             val job = scope.launch {
-                log(TAG_EXAMPLE_12,"parent start")
+                log(TAG_EXAMPLE_12, "parent start")
                 launch {
-                    log(TAG_EXAMPLE_12,"child start")
+                    log(TAG_EXAMPLE_12, "child start")
                     delay(1000)
-                    log(TAG_EXAMPLE_12,"child end")
+                    log(TAG_EXAMPLE_12, "child end")
                 }
-                log(TAG_EXAMPLE_12,"parent end")
+                log(TAG_EXAMPLE_12, "parent end")
             }
 
             scope.launch {
                 delay(500)
-                log(TAG_EXAMPLE_12,"parent job is active: ${job.isActive}")
+                log(TAG_EXAMPLE_12, "parent job is active: ${job.isActive}")
                 delay(1000)
-                log(TAG_EXAMPLE_12,"parent job is active: ${job.isActive}")
+                log(TAG_EXAMPLE_12, "parent job is active: ${job.isActive}")
             }
         }
     }
@@ -452,10 +453,258 @@ class FirstFragment : Fragment() {
          *
          * https://startandroid.ru/ru/courses/kotlin/29-course/kotlin/608-urok-13-obrabotka-oshibok.html
          */
-        val scope = CoroutineScope(Dispatchers.Default)
+        val scope = CoroutineScope(Job() + Dispatchers.Default)
+        val scope2 = CoroutineScope(Job() + Dispatchers.Default)
+
+        /* 1. НЕПРАВИЛЬНАЯ обработка ошибки корутины */
+        fun onRunWrongHandleException() {
+            log(TAG_EXAMPLE_13, "onRun start")
+
+            try {
+                scope.launch {
+                    Integer.parseInt("a")
+                }
+            } catch (e: Exception) {
+                log(TAG_EXAMPLE_13, "error $e")
+            }
+        }
+
+        /* 2. ПРАВИЛЬНАЯ обработка ошибки корутины */
+        fun onRunCorrectHandleException() {
+            log(TAG_EXAMPLE_13, "onRun start")
+
+            scope.launch {
+                try {
+                    Integer.parseInt("a")
+                } catch (e: Exception) {
+                    log(TAG_EXAMPLE_13, "error $e")
+                }
+            }
+
+            log(TAG_EXAMPLE_13, "onRun end")
+        }
+
+        /* 3. Обработка ошибки при помощи Handler'a */
+        fun onRunHandlerException() {
+            log(TAG_EXAMPLE_13, "onRunHandlerException start")
+
+            val handler = CoroutineExceptionHandler { context, exception ->
+                log(TAG_EXAMPLE_13,"handled $exception")
+            }
+
+            scope.launch(handler) {
+                Integer.parseInt("a")
+            }
+
+            log(TAG_EXAMPLE_13,"Scope state: isActive = ${scope.isActive}")
+
+            log(TAG_EXAMPLE_13, "onRunHandlerException end")
+        }
+
+        /* 4. Ошибка в корутине приводит к остановке всех корутин в Scope */
+        fun onRunManyCoroutinesException() {
+            log(TAG_EXAMPLE_13, "onRunManyCoroutinesException start")
+
+            val handler = CoroutineExceptionHandler { context, exception ->
+                log(TAG_EXAMPLE_13,"first coroutine exception $exception")
+            }
+
+            scope.launch(handler) {
+                TimeUnit.MILLISECONDS.sleep(1000)
+                Integer.parseInt("a")
+            }
+
+            scope.launch {
+                repeat(5) {
+                    TimeUnit.MILLISECONDS.sleep(300)
+                    log(TAG_EXAMPLE_13,"second coroutine isActive ${isActive}")
+                }
+            }
+
+            log(TAG_EXAMPLE_13, "onRunManyCoroutinesException end")
+        }
+
+        /* 4. Ошибка в корутине в разных Scope не пересекаются */
+        fun onRunManyScopesCoroutineException() {
+            log(TAG_EXAMPLE_13, "onRunManyScopesCoroutineException start")
+
+            val handler = CoroutineExceptionHandler { context, exception ->
+                log(TAG_EXAMPLE_13,"first coroutine exception $exception")
+            }
+
+            scope.launch(handler) {
+                TimeUnit.MILLISECONDS.sleep(1000)
+                Integer.parseInt("a")
+            }
+
+            scope2.launch {
+                repeat(5) {
+                    TimeUnit.MILLISECONDS.sleep(300)
+                    log(TAG_EXAMPLE_13,"second coroutine isActive ${isActive}")
+                }
+            }
+
+            log(TAG_EXAMPLE_13, "onRunManyScopesCoroutineException end")
+        }
+
+        /* 5. Общий Handler для всего Scope (всех запущенных в нем корутин) */
+        fun onScopeContextHandlerCoroutineException() {
+            log(TAG_EXAMPLE_13, "onScopeContextHandlerCoroutineException start")
+
+            val handler = CoroutineExceptionHandler { context, exception ->
+                log(TAG_EXAMPLE_13,"Common coroutine exception $exception")
+            }
+
+            val scopeInner = CoroutineScope(Job() + Dispatchers.Default + handler)
+
+            scopeInner.launch(handler) {
+                TimeUnit.MILLISECONDS.sleep(1000)
+                Integer.parseInt("a")
+            }
+
+            scopeInner.launch {
+                repeat(5) {
+                    TimeUnit.MILLISECONDS.sleep(300)
+                    log(TAG_EXAMPLE_13,"second coroutine isActive ${isActive}")
+                }
+            }
+
+            scopeInner.launch {
+                repeat(2) {
+                    TimeUnit.MILLISECONDS.sleep(200)
+                    Integer.parseInt("a")
+                    log(TAG_EXAMPLE_13,"third coroutine isActive ${isActive}")
+                }
+            }
+
+            log(TAG_EXAMPLE_13, "onScopeContextHandlerCoroutineException end")
+        }
+
+        /* 6. Использование SupervisorJob, чтобы не отменять все корутины в Scope, если в одной произошла ошибка */
+        fun onSupervisorJobCoroutineException() {
+            log(TAG_EXAMPLE_13, "onSupervisorJobCoroutineException start")
+
+            val handler = CoroutineExceptionHandler { context, exception ->
+                log(TAG_EXAMPLE_13,"first coroutine exception $exception")
+            }
+
+            val scopeInner = CoroutineScope(SupervisorJob() + Dispatchers.Default + handler)
+
+            scopeInner.launch {
+                TimeUnit.MILLISECONDS.sleep(1000)
+                Integer.parseInt("a")
+            }
+
+            scopeInner.launch {
+                repeat(5) {
+                    TimeUnit.MILLISECONDS.sleep(300)
+                    log(TAG_EXAMPLE_13,"second coroutine isActive ${isActive}")
+                }
+            }
+
+            log(TAG_EXAMPLE_13, "onSupervisorJobCoroutineException end")
+        }
 
         binding.example13Btn.setOnClickListener {
+//            onRunWrongHandleException()
+//            onRunCorrectHandleException()
+//            onRunHandlerException()
+//            onRunManyCoroutinesException()
+//            onRunManyScopesCoroutineException()
+//            onScopeContextHandlerCoroutineException()
+            onSupervisorJobCoroutineException()
+        }
+    }
 
+    private fun coroutineExample14() {
+        /*
+         * Урок 14. Корутины. Обработка исключений. Вложенные корутины
+         *
+         * https://startandroid.ru/ru/courses/kotlin/29-course/kotlin/609-urok-14-korutiny-obrabotka-isklyucheniy-vlozhennye-korutiny.html
+         */
+        val handler = CoroutineExceptionHandler { context, exception ->
+            log(TAG_EXAMPLE_14, "$exception was handled in Coroutine_${context[CoroutineName]?.name}")
+        }
+
+        val scope = CoroutineScope(Job() + Dispatchers.IO + handler)
+
+        fun onRun1() {
+            scope.launch(CoroutineName("1")) {
+                launch(CoroutineName("1_1")) {
+                    launch(CoroutineName("1_2")) {
+                        launch(CoroutineName("1_3")) {
+                            TimeUnit.MILLISECONDS.sleep(500)
+                            Integer.parseInt("a")
+                        }
+                        TimeUnit.MILLISECONDS.sleep(500)
+                        Integer.parseInt("a")
+                    }
+                    TimeUnit.MILLISECONDS.sleep(500)
+                    Integer.parseInt("a")
+                }
+
+                launch(CoroutineName("1_2")) {
+                    TimeUnit.MILLISECONDS.sleep(1000)
+                }
+            }
+
+            scope.launch(CoroutineName("2")) {
+                launch(CoroutineName("2_1")) {
+                    TimeUnit.MILLISECONDS.sleep(1000)
+                }
+                launch(CoroutineName("2_2")) {
+                    TimeUnit.MILLISECONDS.sleep(1000)
+                }
+            }
+        }
+
+        fun onRun2() {
+            scope.launch(CoroutineName("1")) {
+                launch(CoroutineName("1_1")) {
+                    TimeUnit.MILLISECONDS.sleep(1000)
+                    log(TAG_EXAMPLE_14, "exception")
+                    Integer.parseInt("a")
+                }
+                launch(CoroutineName("1_2")) { repeatIsActive() }
+                repeatIsActive()
+            }
+
+            scope.launch(CoroutineName("2")) {
+                launch(CoroutineName("2_1")) { repeatIsActive() }
+                launch(CoroutineName("2_2")) { repeatIsActive() }
+                repeatIsActive()
+            }
+        }
+
+         binding.example14Btn.setOnClickListener {
+//             onRun1()
+             onRun2()
+        }
+    }
+
+    private fun coroutineExample15() {
+        /*
+         * Урок 15. Корутины. Обработка исключений. Async, suspend.
+         *
+         * https://startandroid.ru/ru/courses/kotlin/29-course/kotlin/609-urok-14-korutiny-obrabotka-isklyucheniy-vlozhennye-korutiny.html
+         */
+        val handler = CoroutineExceptionHandler { context, exception ->
+            log(TAG_EXAMPLE_15, "$exception was handled in Coroutine_${context[CoroutineName]?.name}")
+        }
+
+        val scope = CoroutineScope(Job() + Dispatchers.IO + handler)
+
+        fun onRun1() {
+
+        }
+
+        fun onRun2() {
+
+        }
+
+        binding.example15Btn.setOnClickListener {
+//             onRun1()
+            onRun2()
         }
     }
 
@@ -475,7 +724,7 @@ class FirstFragment : Fragment() {
         val id: Long,
         val name: String,
         val age: Int
-    ): AbstractCoroutineContextElement(UserData) {
+    ) : AbstractCoroutineContextElement(UserData) {
         companion object Key : CoroutineContext.Key<UserData>
     }
 
@@ -486,4 +735,11 @@ class FirstFragment : Fragment() {
                 it.resume("Data")
             }
         }
+
+    private fun CoroutineScope.repeatIsActive() {
+        repeat(5) {
+            TimeUnit.MILLISECONDS.sleep(300)
+            log(TAG_EXAMPLE_14, "Coroutine_${coroutineContext[CoroutineName]?.name} isActive $isActive")
+        }
+    }
 }
